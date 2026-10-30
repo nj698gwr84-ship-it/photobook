@@ -1,0 +1,1235 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>СКАЗКА STUDIO — конструктор детских книг</title>
+<style>
+:root {
+  --bg:#f7f5fb;
+  --card:#fff;
+  --ink:#272139;
+  --muted:#797389;
+  --purple:#7753c4;
+  --line:#e5dfed;
+  --light:#f2edfb;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:var(--bg);
+  font:14px/1.5 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  color:var(--ink);
+}
+button,input,select,textarea {font:inherit}
+button {cursor:pointer}
+.layout {
+  display:grid;
+  grid-template-columns:225px minmax(360px,1fr) minmax(310px,410px);
+  min-height:100vh;
+}
+nav {
+  background:#252039;
+  color:#fff;
+  padding:24px 14px;
+  position:sticky;
+  top:0;
+  height:100vh;
+}
+.brand {font:bold 24px Georgia,serif;padding:5px 10px}
+.hint {font-size:12px;color:#beb4d2;padding:5px 10px 30px}
+.tab {
+  width:100%;
+  border:1px solid transparent;
+  background:transparent;
+  color:#e6deef;
+  display:block;
+  text-align:left;
+  padding:14px 12px;
+  border-radius:12px;
+  margin-bottom:6px;
+  font-weight:700;
+}
+.tab.active {background:#6d51a3;color:white}
+.tab:hover {background:#6d51a370}
+.navbottom {font-size:11px;color:#b8b0c4;margin:40px 10px}
+main {padding:28px clamp(14px,3vw,40px) 70px;min-width:0}
+h1 {font:normal 35px Georgia,serif;margin:9px 0}
+h2 {font-size:17px;margin:0 0 6px}
+.sub {color:var(--muted);font-size:13px;margin:0 0 23px}
+.head {display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.tag {font-size:11px;color:var(--purple);font-weight:800;letter-spacing:1px}
+.actions,.buttons {display:flex;gap:8px;flex-wrap:wrap}
+.btn {
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:10px;
+  padding:10px 13px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--ink);
+}
+.btn:hover {filter:brightness(.97)}
+.primary {background:var(--purple);border-color:var(--purple);color:#fff}
+.danger {background:#fff0f0;color:#a63248}
+.card {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:19px;
+  margin:0 0 17px;
+  box-shadow:0 4px 23px #4d33610a;
+}
+.card>p {font-size:12px;color:var(--muted);margin:0 0 14px}
+.grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field {min-width:0}
+.field.full {grid-column:1/-1}
+.field label {display:block;font-weight:700;font-size:12px;margin:0 0 5px}
+.field input:not([type=checkbox]),.field select,.field textarea {
+  width:100%;
+  min-width:0;
+  border:1px solid #dcd5e8;
+  border-radius:10px;
+  padding:10px 11px;
+  color:var(--ink);
+  background:white;
+  outline:0;
+}
+.field textarea {min-height:85px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus {
+  border-color:var(--purple);
+  box-shadow:0 0 0 3px #7753c41a;
+}
+.check {display:flex;align-items:center;gap:9px;font-weight:700;font-size:12px;padding:10px 0}
+.check input {accent-color:var(--purple);width:17px;height:17px}
+.item {
+  background:#faf8fe;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:13px;
+  margin-bottom:11px;
+}
+.itemhead {display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:12px;font-weight:700}
+.notice {background:var(--light);border-radius:12px;padding:12px;font-size:12px;color:#614e8b;margin-top:12px}
+.pagebar {display:flex;gap:7px;flex-wrap:wrap;margin-bottom:15px}
+.pagebtn {padding:8px 11px;border:1px solid #dcd5e8;border-radius:9px;background:white;font-weight:700}
+.pagebtn.active {color:white;background:var(--purple)}
+.pagebtn.ok:not(.active) {background:#e6f6ed;color:#218052}
+.footer {display:flex;justify-content:space-between;gap:9px;margin-top:17px}
+.preview {
+  background:#efebf3;
+  border-left:1px solid #e2dbe8;
+  padding:25px 18px;
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow:auto;
+}
+.preview pre {
+  background:white;
+  border:1px solid #e2dce9;
+  border-radius:12px;
+  padding:15px;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  font:12px/1.65 Consolas,monospace;
+  max-height:calc(100vh - 195px);
+  min-height:200px;
+  overflow:auto;
+}
+.preview .primary {flex:1}
+.small {font-size:11px;color:var(--muted)}
+#toast {
+  position:fixed;
+  bottom:19px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#272139;
+  color:#fff;
+  padding:11px 18px;
+  border-radius:11px;
+  z-index:5;
+  opacity:0;
+  pointer-events:none;
+  transition:.2s;
+}
+#toast.visible {opacity:1}
+#upload {display:none}
+@media(max-width:1150px){
+  .layout {grid-template-columns:200px 1fr}
+  .preview {grid-column:2;position:static;height:auto;background:none;border:0;padding:0 25px 30px}
+  .preview pre {max-height:420px}
+}
+@media(max-width:700px){
+  .layout {display:block}
+  nav {height:auto;position:static;padding:13px}
+  .brand {font-size:21px}
+  .hint,.navbottom {display:none}
+  .navlinks {display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .tab {font-size:12px;padding:10px;margin:0}
+  main {padding:23px 13px}
+  .grid {grid-template-columns:1fr}
+  .field.full {grid-column:auto}
+  .card {padding:15px}
+  h1 {font-size:29px}
+  .preview {padding:0 13px 28px}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav>
+ <div class="brand">📚 СКАЗКА STUDIO</div>
+ <div class="hint">Мастерская персональных детских книг</div>
+ <div class="navlinks">
+  <button class="tab active" data-stage="1">① Персонажи</button>
+  <button class="tab" data-stage="2">② Сказка</button>
+  <button class="tab" data-stage="3">③ Иллюстрации</button>
+  <button class="tab" data-stage="4">④ Печать и PDF</button>
+ </div>
+ <div class="navbottom">Проект сохраняется в браузере. Для переноса на другой компьютер скачайте резервную копию проекта.</div>
+</nav>
+<main>
+ <div class="head">
+  <span class="tag">КОНСТРУКТОР ПРОМТОВ</span>
+  <div class="actions">
+   <button class="btn" data-action="export">⬇ Проект</button>
+   <button class="btn" data-action="import">⬆ Импорт</button>
+   <button class="btn danger" data-action="reset">Очистить</button>
+   <input id="upload" type="file" accept=".json,application/json">
+  </div>
+ </div>
+ <h1 id="heading"></h1>
+ <p class="sub" id="subtitle"></p>
+ <div id="form"></div>
+ <div class="footer">
+  <button class="btn" data-action="prev">← Назад</button>
+  <button class="btn primary" data-action="next">Следующий этап →</button>
+ </div>
+</main>
+<aside class="preview">
+ <h2>Готовый промт</h2>
+ <p class="small">Настройки подставляются автоматически. После копирования приложите нужные фото к сообщению в ChatGPT.</p>
+ <pre id="result"></pre>
+ <div class="buttons">
+  <button class="btn primary" data-action="copy">📋 Копировать промт</button>
+  <button class="btn" data-action="txt">TXT</button>
+ </div>
+ <p id="stats" class="small"></p>
+</aside>
+</div>
+<div id="toast"></div>
+<script>
+'use strict';
+
+const KEY='skazka_studio_copy_v1';
+
+const blankPage=()=>({
+ title:'',
+ text:'',
+ scene:'',
+ approved:false
+});
+
+const fresh=()=>({
+ stage:1,
+ currentPage:1,
+ book:{
+  title:'',
+  size:'210 × 148 мм (A5)',
+  ownSize:'',
+  orientation:'Горизонтальная',
+  binding:'Твёрдый',
+  dpi:'300',
+  bleed:'3',
+  safe:'10',
+  printing:false,
+  art:'Классическая книжная',
+  artOwn:'',
+  colors:'Тёплые',
+  colorsOwn:'',
+  detail:'Высокая',
+  ref:false
+ },
+ people:{
+  child:{
+   name:'',
+   age:'',
+   gender:'',
+   character:'Добрый',
+   characterOwn:'',
+   look:'По фотографии',
+   lookOwn:'',
+   hobbies:'',
+   details:''
+  },
+  mother:{
+   enabled:false,
+   name:'',
+   character:'',
+   look:'По фотографии',
+   lookOwn:'',
+   role:'Мама',
+   roleOwn:''
+  },
+  father:{
+   enabled:false,
+   name:'',
+   character:'',
+   look:'По фотографии',
+   lookOwn:'',
+   role:'Папа',
+   roleOwn:''
+  },
+  other:[],
+  animals:[],
+  toys:[],
+  wishes:'',
+  forbidden:''
+ },
+ story:{
+  name:'Придумать',
+  nameOwn:'',
+  theme:'Космос',
+  themeOwn:'',
+  count:'8',
+  age:'1–3 года',
+  ageOwn:'',
+  length:'Средний',
+  genre:'Приключение',
+  genreOwn:'',
+  mood:'Доброе',
+  moodOwn:'',
+  moral:'Дружба',
+  moralOwn:'',
+  where:'',
+  goal:'',
+  difficulty:'',
+  events:'',
+  end:'Счастливый',
+  endOwn:'',
+  style:'Классическая сказка',
+  styleOwn:'',
+  dialogues:'Умеренно',
+  description:'Умеренные',
+  wishes:'',
+  paste:'',
+  pages:Array.from({length:8},blankPage)
+ },
+ image:{
+  mode:'Иллюстрация страницы',
+  page:'1',
+  who:'Ребёнок',
+  characters:'',
+  clothes:'',
+  place:'',
+  objects:'',
+  details:'',
+  position:'По центру',
+  textPosition:'Автоматически',
+  light:'Дневное',
+  camera:'По сюжету',
+  fix:'',
+  photos:false
+ },
+ print:{
+  mode:'Оформить страницу',
+  page:'1',
+  position:'Автоматически',
+  font:'Сказочный читаемый',
+  fontOwn:'',
+  fontSize:'Автоматически',
+  color:'По контрасту',
+  overlay:'Без подложки',
+  format:'PDF',
+  numbering:false,
+  subtitle:'',
+  dedication:'',
+  tocStyle:'Сказочное',
+  spine:'',
+  back:'',
+  cover:'Утверждённые рисунки',
+  coverWishes:'',
+  addTitle:true,
+  addDedication:false,
+  addToc:false,
+  addEnd:false,
+  endText:'Конец сказки',
+  notes:''
+ }
+});
+
+let state=fresh();
+
+try {
+ let old=JSON.parse(localStorage.getItem(KEY));
+ if(old?.book&&old?.people&&old?.story?.pages&&old?.image&&old?.print) {
+  state=old;
+ }
+} catch {}
+
+const $=s=>document.querySelector(s);
+
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({
+ '&':'&amp;',
+ '<':'&lt;',
+ '>':'&gt;',
+ '"':'&quot;',
+ "'":'&#39;'
+}[c]));
+
+const val=path=>path.split('.').reduce((o,k)=>o?.[k],state);
+
+function put(path,value){
+ let a=path.split('.'),o=state;
+ for(let i=0;i<a.length-1;i++)o=o[a[i]];
+ o[a.at(-1)]=value;
+ if(path==='story.count')resizePages();
+}
+
+function persist(){
+ try{localStorage.setItem(KEY,JSON.stringify(state))}catch{}
+}
+
+function resizePages(){
+ let n=Math.min(40,Math.max(1,parseInt(state.story.count)||8));
+ while(state.story.pages.length<n)state.story.pages.push(blankPage());
+ state.story.pages.length=n;
+ state.currentPage=Math.min(state.currentPage,n);
+ state.image.page=String(Math.min(+state.image.page||1,n));
+ state.print.page=String(Math.min(+state.print.page||1,n));
+}
+
+const choices={
+ gender:['Мальчик','Девочка','Не указывать'],
+ nature:['Добрый','Смелый','Весёлый','Любознательный','Свой'],
+ look:['По фотографии','По описанию'],
+ theme:['Космос','Волшебный лес','Динозавры','Море','Королевство','Животные','Свой'],
+ age:['1–3 года','4–6 лет','7–9 лет','Свой'],
+ genre:['Приключение','Волшебная сказка','Загадка','Семейная история','Свой'],
+ mood:['Доброе','Весёлое','Волшебное','Захватывающее','Своё'],
+ moral:['Дружба','Смелость','Семья','Доброта','Своя'],
+ end:['Счастливый','Трогательный','Неожиданный и добрый','Свой'],
+ style:['Классическая сказка','Современная сказка','Весёлый','Нежный','Свой'],
+ art:['Акварель','Классическая книжная','Мультяшный 2D','Гуашь','Свой'],
+ colors:['Тёплые','Пастельные','Яркие','Свои'],
+ size:['210 × 148 мм (A5)','200 × 150 мм','Свой'],
+ orient:['Горизонтальная','Вертикальная']
+};
+
+function field(path,label,type='text',options=[],placeholder=''){
+ let v=val(path);
+ if(type==='check'){
+  return `<label class="check"><input type="checkbox" data-path="${path}" ${v?'checked':''}> ${esc(label)}</label>`;
+ }
+ let inner=type==='select'
+  ?`<select data-path="${path}">${options.map(x=>`<option value="${esc(x)}" ${String(v)===x?'selected':''}>${esc(x)}</option>`).join('')}</select>`
+  :type==='area'
+  ?`<textarea data-path="${path}" placeholder="${esc(placeholder)}">${esc(v)}</textarea>`
+  :`<input data-path="${path}" type="${type==='number'?'number':'text'}" value="${esc(v)}" placeholder="${esc(placeholder)}">`;
+ return `<div class="field ${type==='area'?'full':''}"><label>${esc(label)}</label>${inner}</div>`;
+}
+
+function block(title,description,html){
+ return `<section class="card"><h2>${title}</h2>${description?`<p>${description}</p>`:''}${html}</section>`;
+}
+
+function grid(...items){
+ return `<div class="grid">${items.join('')}</div>`;
+}
+
+function note(text){
+ return `<div class="notice">${text}</div>`;
+}
+
+function commonBook(){
+ let b=state.book;
+ return block('Художественный паспорт книги','Эти параметры автоматически попадут в промты следующих этапов.',
+ grid(
+  field('book.art','Рисовка','select',choices.art),
+  ...(b.art==='Свой'?[field('book.artOwn','Свой стиль')]:[]),
+  field('book.colors','Палитра','select',choices.colors),
+  ...(b.colors==='Свои'?[field('book.colorsOwn','Свои цвета')]:[]),
+  field('book.detail','Детализация','select',['Средняя','Высокая','Очень высокая']),
+  field('book.ref','Образец рисовки будет прикреплён','check')
+ ));
+}
+
+function commonPrint(){
+ return block('Размер и печать','Если типография ещё не выбрана, эти значения предварительные.',
+ grid(
+  field('book.size','Размер готовой страницы','select',choices.size),
+  ...(state.book.size==='Свой'?[field('book.ownSize','Размер в мм')]:[]),
+  field('book.orientation','Ориентация','select',choices.orient),
+  field('book.binding','Переплёт','select',['Твёрдый','Мягкий']),
+  field('book.dpi','Разрешение DPI','number'),
+  field('book.bleed','Вылеты, мм','number'),
+  field('book.safe','Безопасные поля, мм','number'),
+  field('book.printing','Шаблон типографии будет прикреплён','check')
+ ));
+}
+
+function personCard(key,title,roles){
+ let p=state.people[key];
+ return block(title,'Добавляй только тех героев, которые участвуют в истории.',
+ field(`people.${key}.enabled`,'Включить персонажа','check')+
+ (p.enabled?grid(
+  field(`people.${key}.name`,'Имя'),
+  field(`people.${key}.character`,'Характер'),
+  field(`people.${key}.look`,'Внешность','select',choices.look),
+  ...(p.look==='По описанию'?[field(`people.${key}.lookOwn`,'Описание внешности')]:[]),
+  field(`people.${key}.role`,'Роль в сказке','select',roles),
+  ...(p.role==='Своя'?[field(`people.${key}.roleOwn`,'Своя роль')]:[])
+ ):''));
+}
+
+const listFields={
+ other:['Имя','Кем приходится ребёнку','Возраст','Внешность','Характер','Роль в сказке'],
+ animals:['Кличка','Вид и порода','Внешность','Характер','Роль в сказке'],
+ toys:['Название','Внешность','Особенности','Роль в сказке']
+};
+
+const listTitles={
+ other:'Другие персонажи',
+ animals:'Животные',
+ toys:'Игрушки и предметы'
+};
+
+function listCard(key){
+ return block(listTitles[key],'Можно добавить любое количество.',
+ state.people[key].map((arr,i)=>`
+ <div class="item">
+  <div class="itemhead">
+   <span>№ ${i+1}</span>
+   <button class="btn danger" data-action="delete" data-list="${key}" data-index="${i}">Удалить</button>
+  </div>
+  ${grid(...listFields[key].map((name,j)=>field(`people.${key}.${i}.${j}`,name)))}
+ </div>`).join('')+
+ `<button class="btn" data-action="add" data-list="${key}">＋ Добавить</button>`);
+}
+
+function stage1(){
+ let c=state.people.child;
+ return block('Главный герой — ребёнок','Фото ребёнка прикрепляется отдельно к сообщению в ChatGPT.',
+ grid(
+  field('people.child.name','Имя ребёнка'),
+  field('people.child.age','Возраст'),
+  field('people.child.gender','Пол','select',choices.gender),
+  field('people.child.character','Характер','select',choices.nature),
+  ...(c.character==='Свой'?[field('people.child.characterOwn','Свой характер')]:[]),
+  field('people.child.look','Внешность','select',choices.look),
+  ...(c.look==='По описанию'?[field('people.child.lookOwn','Описание внешности','area')]:[]),
+  field('people.child.hobbies','Любимые занятия'),
+  field('people.child.details','Особенности','area')
+ ))+
+ personCard('mother','Мама',['Мама','Волшебница','Королева','Своя'])+
+ personCard('father','Папа',['Папа','Рыцарь','Король','Волшебник','Своя'])+
+ listCard('other')+
+ listCard('animals')+
+ listCard('toys')+
+ block('Пожелания и ограничения','Не придумывать факты о реальных людях.',
+ grid(
+  field('people.wishes','Особые пожелания','area'),
+  field('people.forbidden','Что нельзя добавлять','area')
+ ))+
+ note('Сайт создаёт текстовый промт, но не прикрепляет фотографии автоматически. Фото нужно прикладывать к сообщению в ChatGPT.');
+}
+
+function pageTabs(){
+ return `<div class="pagebar">${state.story.pages.map((p,i)=>`
+ <button class="pagebtn ${i+1===state.currentPage?'active':''} ${p.approved?'ok':''}" data-page="${i+1}">
+ ${String(i+1).padStart(2,'0')}${p.approved?' ✓':''}
+ </button>`).join('')}</div>`;
+}
+
+function pagesEditor(){
+ let n=state.currentPage;
+ return block('Библиотека страниц','Вставь всю сказку в поле ниже и нажми «Разобрать», либо редактируй страницы по одной.',
+ pageTabs()+
+ grid(
+  field(`story.pages.${n-1}.title`,'Название эпизода'),
+  field(`story.pages.${n-1}.approved`,'Текст страницы утверждён','check'),
+  field(`story.pages.${n-1}.text`,'Утверждённый текст страницы','area'),
+  field(`story.pages.${n-1}.scene`,'Сцена для иллюстрации','area')
+ )+note('Изменение утверждённого текста снимает отметку утверждения.'));
+}
+
+function stage2(){
+ let s=state.story;
+ return block('Параметры истории','Сначала сформируй сказку, затем вставь полученный текст в библиотеку страниц.',
+ grid(
+  field('book.title','Название книги (можно оставить пустым)'),
+  field('story.name','Название','select',['Придумать','Своё']),
+  ...(s.name==='Своё'?[field('story.nameOwn','Свой вариант')]:[]),
+  field('story.theme','Тема','select',choices.theme),
+  ...(s.theme==='Свой'?[field('story.themeOwn','Своя тема')]:[]),
+  field('story.count','Сюжетных страниц','select',Array.from({length:20},(_,i)=>String(i+1))),
+  field('story.age','Возраст читателей','select',choices.age),
+  ...(s.age==='Свой'?[field('story.ageOwn','Свой возраст')]:[]),
+  field('story.length','Объём текста','select',['Короткий','Средний','Подробный'])
+ ))+
+ block('Сюжет и литературный стиль','',
+ grid(
+  field('story.genre','Жанр','select',choices.genre),
+  ...(s.genre==='Свой'?[field('story.genreOwn','Свой жанр')]:[]),
+  field('story.mood','Настроение','select',choices.mood),
+  ...(s.mood==='Своё'?[field('story.moodOwn','Своё настроение')]:[]),
+  field('story.moral','Главная идея','select',choices.moral),
+  ...(s.moral==='Своя'?[field('story.moralOwn','Своя идея')]:[]),
+  field('story.where','Место действия'),
+  field('story.goal','Цель главного героя'),
+  field('story.difficulty','Препятствие'),
+  field('story.events','Важные события','area'),
+  field('story.end','Финал','select',choices.end),
+  ...(s.end==='Свой'?[field('story.endOwn','Свой финал')]:[]),
+  field('story.style','Стиль','select',choices.style),
+  ...(s.style==='Свой'?[field('story.styleOwn','Свой литературный стиль')]:[]),
+  field('story.dialogues','Диалоги','select',['Мало','Умеренно','Много']),
+  field('story.description','Описания','select',['Краткие','Умеренные','Подробные']),
+  field('story.wishes','Дополнительные пожелания','area')
+ ))+
+ commonBook()+
+ commonPrint()+
+ block('Импорт готовой сказки','После генерации вставь ответ ChatGPT в это поле.',
+ field('story.paste','Весь текст со страницами','area',[],'СТРАНИЦА 01\nТекст сказки:\n...\nСцена для рисунка:\n...')+
+ '<p><button class="btn primary" data-action="parse">Разобрать сказку по страницам</button></p>')+
+ pagesEditor();
+}
+
+function pageChoices(){
+ return state.story.pages.map((_,i)=>String(i+1));
+}
+
+function stage3(){
+ let i=state.image;
+ let panel=block('Режим создания','Выбирай режим: эталон, сцена либо исправление.',
+ grid(
+  field('image.mode','Режим','select',['Эталон персонажа','Иллюстрация страницы','Исправление рисунка']),
+  ...(i.mode==='Эталон персонажа'
+   ?[field('image.who','Кто на эталоне')]
+   :[field('image.page','Номер страницы','select',pageChoices())]),
+  field('image.photos','Фото и эталоны приложу в ChatGPT','check')
+ ));
+ if(i.mode!=='Эталон персонажа'){
+  let p=state.story.pages[(+i.page||1)-1]||blankPage();
+  panel+=note(`Страница ${i.page}. Текст: ${esc(p.text?.slice(0,200)||'не заполнен')}${p.text?.length>200?'…':''}. Сцена: ${esc(p.scene||'не заполнена')}`);
+ }
+ panel+=block('Детали рисунка','Не изменяй утверждённых героев и художественный стиль.',
+ grid(
+  field('image.characters','Персонажи в сцене'),
+  field('image.clothes','Одежда, позы и эмоции','area'),
+  field('image.place','Место действия'),
+  field('image.objects','Важные предметы'),
+  field('image.position','Расположение героев','select',['По центру','Слева','Справа','Своё']),
+  field('image.textPosition','Свободное место для текста','select',['Автоматически','Слева','Справа','Сверху','Снизу']),
+  field('image.light','Освещение','select',['Дневное','Ночное','Волшебное','Закатное','Комнатное']),
+  field('image.camera','Ракурс','select',['По сюжету','Общий план','Средний план','Крупный план']),
+  ...(i.mode==='Исправление рисунка'?[field('image.fix','Что исправить','area')]:[]),
+  field('image.details','Дополнительные пожелания','area')
+ ))+
+ note('На иллюстрации НЕ должно быть текста, рамок и подложек. Фото и утверждённые изображения нужно приложить отдельно.');
+ return panel;
+}
+
+function stage4(){
+ let p=state.print;
+ let h=block('Выбери задачу','Оформление страниц, титул, оглавление, обложка и сборка — разные промты.',
+ grid(
+  field('print.mode','Режим','select',['Оформить страницу','Титульный лист','Оглавление','Создать обложку','Собрать книгу']),
+  ...(p.mode==='Оформить страницу'?[field('print.page','Страница','select',pageChoices())]:[])
+ ));
+ if(p.mode==='Оформить страницу'){
+  h+=block('Оформление текста','По умолчанию без рамок, фонов и подложек.',
+  grid(
+   field('print.position','Расположение текста','select',['Автоматически','Слева','Справа','Сверху','Снизу']),
+   field('print.font','Шрифт','select',['Сказочный читаемый','Классический книжный','Современный','Свой']),
+   ...(p.font==='Свой'?[field('print.fontOwn','Название шрифта')]:[]),
+   field('print.fontSize','Размер','select',['Автоматически','Крупный','Средний']),
+   field('print.color','Цвет','select',['По контрасту','Тёмный','Светлый']),
+   field('print.overlay','Подложка','select',['Без подложки','Светлая','Полупрозрачная']),
+   field('print.numbering','Номера страниц','check'),
+   field('print.format','Формат файла','select',['PDF','PNG','TIFF'])
+  ));
+ }
+ if(p.mode==='Титульный лист'){
+  h+=block('Титульный лист','',
+  grid(
+   field('print.subtitle','Подзаголовок'),
+   field('print.dedication','Посвящение')
+  ));
+ }
+ if(p.mode==='Оглавление'){
+  h+=block('Оглавление','',
+  grid(
+   field('print.tocStyle','Стиль','select',['Сказочное','Классическое','Минималистичное']),
+   field('print.numbering','Показывать номера страниц','check')
+  ));
+ }
+ if(p.mode==='Создать обложку'){
+  h+=block('Обложка','Развёртка твёрдой обложки требует официального шаблона типографии.',
+  grid(
+   field('print.spine','Надпись на корешке'),
+   field('print.back','Текст задней обложки','area'),
+   field('print.cover','Иллюстрации','select',['Утверждённые рисунки','Нужно создать']),
+   field('print.coverWishes','Пожелания','area')
+  ));
+ }
+ if(p.mode==='Собрать книгу'){
+  h+=block('Состав книги','',
+  grid(
+   field('print.addTitle','Добавить титульный лист','check'),
+   field('print.addDedication','Добавить посвящение','check'),
+   field('print.addToc','Добавить оглавление','check'),
+   field('print.addEnd','Добавить заключительную страницу','check'),
+   ...(p.addEnd?[field('print.endText','Надпись в конце')]:[]),
+   field('print.notes','Дополнительные требования','area')
+  ));
+ }
+ return h+commonPrint()+note('Для финального печатного PDF нужны реальные утверждённые файлы и технические требования выбранной типографии.');
+}
+
+function choose(value,own){
+ return ['Свой','Своя','Своё','Свои'].includes(value)?own||'не заполнено':value;
+}
+
+function lines(items){
+ return items.filter(x=>x[1]!==''&&x[1]!=null).map(([k,v])=>`${k}: ${v}`).join('\n');
+}
+
+function bookName(){
+ let s=state.story;
+ return state.book.title||(s.name==='Своё'?s.nameOwn:'[название придумать на этапе сказки]');
+}
+
+function identity(){
+ let c=state.people.child,p=state.people;
+ let out='ГЛАВНЫЙ ГЕРОЙ\n'+lines([
+  ['Имя',c.name],
+  ['Возраст',c.age],
+  ['Пол',c.gender],
+  ['Характер',choose(c.character,c.characterOwn)],
+  ['Внешность',c.look==='По фотографии'?'По приложенному фото':c.lookOwn],
+  ['Любимые занятия',c.hobbies],
+  ['Особенности',c.details]
+ ]);
+ for(let [key,label] of [['mother','МАМА'],['father','ПАПА']]){
+  let o=p[key];
+  if(o.enabled){
+   out+='\n\n'+label+'\n'+lines([
+    ['Имя',o.name],
+    ['Характер',o.character],
+    ['Внешность',o.look==='По фотографии'?'По приложенному фото':o.lookOwn],
+    ['Роль',choose(o.role,o.roleOwn)]
+   ]);
+  }
+ }
+ for(let key of ['other','animals','toys']){
+  if(p[key].length){
+   out+='\n\n'+listTitles[key].toUpperCase()+'\n'+
+   p[key].map((r,i)=>`${i+1}. ${r.map((v,j)=>v?`${listFields[key][j]}: ${v}`:'').filter(Boolean).join('; ')}`).join('\n');
+  }
+ }
+ out+='\n\n'+lines([
+  ['Пожелания',p.wishes],
+  ['Запрещено добавлять',p.forbidden]
+ ]);
+ return out;
+}
+
+function artInfo(){
+ let b=state.book;
+ return lines([
+  ['Рисовка',choose(b.art,b.artOwn)],
+  ['Цвета',choose(b.colors,b.colorsOwn)],
+  ['Детализация',b.detail],
+  ['Образец стиля',b.ref?'Будет приложен':'Не приложен']
+ ]);
+}
+
+function printInfo(){
+ let b=state.book;
+ return lines([
+  ['Размер после обрезки',b.size==='Свой'?b.ownSize:b.size],
+  ['Ориентация',b.orientation],
+  ['Переплёт',b.binding],
+  ['Разрешение',b.dpi+' DPI'],
+  ['Вылеты',b.bleed+' мм'],
+  ['Безопасные поля',b.safe+' мм'],
+  ['Шаблон типографии',b.printing?'Будет приложен':'Пока отсутствует']
+ ]);
+}
+
+const rules=`ОБЩИЕ ПРАВИЛА:
+— Работай последовательно, не изменяй утверждённые тексты, лица, рисовку или изображения без разрешения.
+— Не придумывай факты о реальных людях.
+— Если фотографии или утверждённые материалы не приложены и недоступны в текущей беседе, попроси их предоставить.
+— Не переходи самовольно к следующему этапу.
+`;
+
+function prompt1(){
+ return `🟢 БЛОК №1 — ПАСПОРТ ПЕРСОНАЖЕЙ
+
+Ты — профессиональный художник и редактор персонализированных детских книг. Составь подробные паспорта героев на основе данных и приложенных фотографий.
+
+${identity()}
+
+${rules}
+Для каждого персонажа перечисли имя, родственные связи, возраст, характер, важные черты внешности, одежду (если известна), неизменные особенности для последующей генерации. Для животных и игрушек создай отдельные паспорта.
+
+Сохраняй форму лица, пропорции, волосы, узнаваемые черты, не заменяй человека случайным типовым лицом. Фотографическая похожесть не гарантируется на 100%.
+
+Пустые поля не заполняй выдуманными фактами.
+
+На этом этапе НЕ создавай сказку и изображения.`;
+}
+
+function prompt2(){
+ let s=state.story;
+ return `🔵 БЛОК №2 — СОЗДАНИЕ СКАЗКИ
+
+Ты — профессиональный детский писатель. На основе утверждённого паспорта персонажей создай оригинальную увлекательную сказку.
+
+НАЗВАНИЕ КНИГИ: ${s.name==='Своё'?s.nameOwn:state.book.title||'Придумать'}
+
+НАСТРОЙКИ
+${lines([
+ ['Тема',choose(s.theme,s.themeOwn)],
+ ['Сюжетных страниц',s.count],
+ ['Возраст читателей',choose(s.age,s.ageOwn)],
+ ['Объём текста',s.length],
+ ['Жанр',choose(s.genre,s.genreOwn)],
+ ['Настроение',choose(s.mood,s.moodOwn)],
+ ['Главная идея',choose(s.moral,s.moralOwn)],
+ ['Место действия',s.where],
+ ['Цель героя',s.goal],
+ ['Основное препятствие',s.difficulty],
+ ['Важные события',s.events],
+ ['Финал',choose(s.end,s.endOwn)],
+ ['Литературный стиль',choose(s.style,s.styleOwn)],
+ ['Диалоги',s.dialogues],
+ ['Описания',s.description],
+ ['Дополнительные пожелания',s.wishes]
+])}
+
+ХУДОЖЕСТВЕННЫЙ СТИЛЬ
+${artInfo()}
+
+ФОРМАТ КНИГИ
+${printInfo()}
+
+ПЕРСОНАЖИ
+${identity()}
+
+${rules}
+Напиши интересную литературную историю с ясным началом, нарастающим действием, кульминацией и добрым финалом.
+
+Сохрани индивидуальность ребёнка и других героев. Не повторяй однотипные сцены, не упрощай сюжет до перечня действий.
+
+Для каждой страницы придумай отдельную выразительную иллюстрацию. Учитывай возраст читателя и выбранную длину текста.
+
+СТРОГО ФОРМАТИРУЙ ОТВЕТ ТАК:
+
+СТРАНИЦА 01
+Название эпизода: ...
+Текст сказки:
+[полный утверждаемый текст]
+Сцена для рисунка:
+[описание иллюстрации без текста на рисунке]
+
+СТРАНИЦА 02
+...
+
+Продолжай до страницы ${String(s.count).padStart(2,'0')}.
+
+На этом этапе НЕ создавай изображения. После утверждения не переписывай историю без разрешения.`;
+}
+
+function page(n){
+ return state.story.pages[(+n||1)-1]||blankPage();
+}
+
+function prompt3(){
+ let i=state.image,p=page(i.page);
+ let x=`🟣 БЛОК №3 — ${i.mode.toUpperCase()}
+
+Ты — профессиональный иллюстратор детских книг. Создай ОДНО изображение в едином стиле утверждённой книги.
+
+КНИГА: ${bookName()}
+
+ХУДОЖЕСТВЕННЫЙ ПАСПОРТ
+${artInfo()}
+
+РАЗМЕР И ОРИЕНТАЦИЯ
+${printInfo()}
+
+${identity()}
+
+`;
+ if(i.mode==='Эталон персонажа'){
+  x+=`ЭТАЛОН: ${i.who}
+
+Создай один эталонный рисунок героя на основании приложенных фото.
+
+Учитывай узнаваемое лицо, возраст, телосложение, причёску, пропорции. Эталон будет использован для следующих иллюстраций.
+`;
+ } else {
+  x+=`СТРАНИЦА ${String(i.page).padStart(2,'0')}
+
+УТВЕРЖДЁННЫЙ ТЕКСТ (НЕ ПИШИ ЕГО НА ИЗОБРАЖЕНИИ):
+${p.text||'[Пока не внесён]'}
+
+СЦЕНА:
+${p.scene||'[Пока не внесена]'}
+`;
+ }
+ if(i.mode==='Исправление рисунка'){
+  x+=`
+ЧТО ИСПРАВИТЬ: ${i.fix||'[Не указано]'}
+
+Исправь только перечисленные детали исходного приложенного рисунка. Не меняй других героев, лица, стиль, фон и композицию без необходимости.
+`;
+ }
+ x+=`
+КОМПОЗИЦИЯ
+${lines([
+ ['Персонажи',i.characters],
+ ['Одежда, позы и эмоции',i.clothes],
+ ['Место действия',i.place],
+ ['Предметы',i.objects],
+ ['Расположение героев',i.position],
+ ['Свободная зона под текст',i.textPosition],
+ ['Освещение',i.light],
+ ['Ракурс',i.camera],
+ ['Пожелания',i.details]
+])}
+
+${rules}
+
+Используй приложенные фото и эталоны; не подменяй внешность персонажей.
+
+Максимальная доступная детализация и разрешение, соответствующее пропорциям страницы.
+
+Иллюстрация на всю страницу, без белых полей и рамок.
+
+Не добавляй никакого текста, букв, водяных знаков или надписей.
+
+Оставь естественное малодетализированное место для будущего текста, не размещай там лица.
+
+Важные детали отодвинь от обрезного края.
+
+Избегай одинаковых фонов и поз на разных страницах.
+
+Результат: ОДНА иллюстрация, без PDF.
+
+${i.photos?'Фотографии и эталоны будут приложены к этому сообщению.':'ВНИМАНИЕ: фото/эталоны ещё не отмечены как прикреплённые.'}`;
+ return x;
+}
+
+function prompt4(){
+ let q=state.print,p=page(q.page);
+ let x=`🟠 БЛОК №4 — ${q.mode.toUpperCase()}
+
+Ты — профессиональный дизайнер детских книг и специалист по печатным макетам.
+
+НАЗВАНИЕ: ${bookName()}
+
+ХУДОЖЕСТВЕННЫЙ СТИЛЬ
+${artInfo()}
+
+ПАРАМЕТРЫ ПЕЧАТИ
+${printInfo()}
+
+`;
+ if(q.mode==='Оформить страницу'){
+  x+=`СТРАНИЦА ${String(q.page).padStart(2,'0')}
+
+УТВЕРЖДЁННЫЙ ТЕКСТ — ПЕРЕНЕСТИ ДОСЛОВНО:
+${p.text||'[Текст не заполнен — запроси его]'}
+
+${lines([
+ ['Расположение текста',q.position],
+ ['Шрифт',choose(q.font,q.fontOwn)],
+ ['Размер букв',q.fontSize],
+ ['Цвет букв',q.color],
+ ['Подложка',q.overlay],
+ ['Номер страницы',q.numbering?'Нужен':'Не нужен'],
+ ['Формат',q.format]
+])}
+
+Используй приложенную утверждённую иллюстрацию, НЕ перерисовывай её.
+
+Текст размещай непосредственно поверх рисунка, элегантно и читабельно.
+
+Никаких рамок, прямоугольных фонов, плашек или белых полей (если отдельно не выбрана подложка).
+
+Красивый кириллический шрифт. Не закрывай лица и важные предметы.
+
+Не меняй ни одного слова, буквы или знака препинания.
+
+Если текст не помещается, сообщи об этом вместо уменьшения до нечитаемого размера.
+
+Сделай только одну оформленную страницу.
+`;
+ }
+ if(q.mode==='Титульный лист'){
+  x+=`Сделай красивый титульный лист в стиле книги, без рамок и лишних фонов.
+
+${lines([
+ ['Название',bookName()],
+ ['Подзаголовок',q.subtitle],
+ ['Посвящение',q.dedication]
+])}
+`;
+ }
+ if(q.mode==='Оглавление'){
+  x+=`Оформи интересное сказочное оглавление, но без тяжёлых рамок, подложек и перегруженных элементов.
+
+Стиль: ${q.tocStyle}.
+Номера страниц: ${q.numbering?'да':'нет'}.
+
+ЭПИЗОДЫ:
+${state.story.pages.map((p,i)=>`${String(i+1).padStart(2,'0')}. ${p.title||'Страница '+(i+1)}`).join('\n')}
+
+Реальные печатные номера уточни после выбора состава внутренних страниц.
+`;
+ }
+ if(q.mode==='Создать обложку'){
+  x+=`Создай единый дизайн ПЕРЕДНЕЙ ОБЛОЖКИ, КОРЕШКА И ЗАДНЕЙ ОБЛОЖКИ.
+
+${lines([
+ ['Название',bookName()],
+ ['Корешок',q.spine],
+ ['Текст сзади',q.back],
+ ['Иллюстрации',q.cover],
+ ['Пожелания',q.coverWishes]
+])}
+
+Не выдумывай ширину корешка, расставы и загибы. Их нужно получить от типографии.
+
+Без официального шаблона подготовь только предварительный дизайн, а не «готовый к печати PDF».
+`;
+ }
+ if(q.mode==='Собрать книгу'){
+  x+=`Собери все утверждённые изображения и тексты по порядку, не перерисовывая их.
+
+Сюжетные страницы: ${state.story.pages.length}.
+
+${lines([
+ ['Титульный лист',q.addTitle?'да':'нет'],
+ ['Посвящение',q.addDedication?'да':'нет'],
+ ['Оглавление',q.addToc?'да':'нет'],
+ ['Заключительная страница',q.addEnd?'да':'нет'],
+ ['Заключительный текст',q.addEnd?q.endText:''],
+ ['Дополнительные требования',q.notes]
+])}
+
+ПРОВЕРКА ГОТОВНОСТИ:
+${state.story.pages.map((p,i)=>`${i+1}. ${p.approved?'Текст утверждён':'Текст НЕ утверждён'}: ${p.title||'Без названия'}`).join('\n')}
+
+Подготовь КНИГА_ПЕЧАТЬ.pdf для внутренних страниц, а ОБЛОЖКА_ПЕЧАТЬ.pdf — только если есть точный шаблон типографии.
+
+Проверь порядок, количество страниц, фактические размеры, вылеты, безопасные поля, встроенные шрифты, достаточное исходное разрешение и отсутствие обрезанных лиц.
+
+Проверь ограничения типографии для твёрдого переплёта.
+
+Если чего-то не хватает, перечисли отсутствующие файлы, а не заменяй их.
+`;
+ }
+ return x+`
+${rules}
+Не заявляй, что PDF готов к печати, пока реальные файлы не созданы и технические параметры не проверены.
+
+Если требований типографии нет, называй результат предварительным макетом.`;
+}
+
+function buildPrompt(){
+ return [prompt1,prompt2,prompt3,prompt4][Math.max(1,Math.min(4,state.stage))-1]();
+}
+
+const titles=[
+ 'Паспорт персонажей',
+ 'Создание сказки',
+ 'Генерация иллюстраций',
+ 'Оформление и печать'
+];
+
+const subtitles=[
+ 'Собери точные данные и характеры героев.',
+ 'Настрой историю и сохрани тексты всех страниц.',
+ 'Генерируй эталоны, отдельные сцены и исправления.',
+ 'Оформи текст без рамок, создай обложку и PDF.'
+];
+
+function showPrompt(){
+ let s=buildPrompt();
+ $('#result').textContent=s;
+ $('#stats').textContent=`${s.length.toLocaleString('ru-RU')} символов. Прикреплённые фото и PDF не передаются вместе с текстом.`;
+}
+
+function render(){
+ state.stage=Math.max(1,Math.min(4,+state.stage||1));
+ resizePages();
+ document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',+b.dataset.stage===state.stage));
+ $('#heading').textContent=titles[state.stage-1];
+ $('#subtitle').textContent=subtitles[state.stage-1];
+ $('#form').innerHTML=[stage1,stage2,stage3,stage4][state.stage-1]();
+ showPrompt();
+ persist();
+}
+
+let toastTimeout;
+
+function toast(s){
+ let el=$('#toast');
+ el.textContent=s;
+ el.classList.add('visible');
+ clearTimeout(toastTimeout);
+ toastTimeout=setTimeout(()=>el.classList.remove('visible'),2300);
+}
+
+function download(name,data,mime='text/plain;charset=utf-8'){
+ let a=document.createElement('a');
+ let url=URL.createObjectURL(new Blob([data],{type:mime}));
+ a.href=url;
+ a.download=name;
+ a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+async function copy(){
+ let text=buildPrompt();
+ try{
+  await navigator.clipboard.writeText(text);
+  toast('Промт скопирован');
+ }catch{
+  let t=document.createElement('textarea');
+  t.value=text;
+  document.body.appendChild(t);
+  t.select();
+  let ok=document.execCommand('copy');
+  t.remove();
+  toast(ok?'Промт скопирован':'Нажмите TXT для сохранения текста');
+ }
+}
+
+function parseStory(raw){
+ let matches=[...raw.matchAll(/^\s*СТРАНИЦА\s*№?\s*(\d{1,2})(?:\s*[—–-][^\n]*)?\s*$/gim)];
+ let done=0;
+ if(!matches.length)return 0;
+ for(let i=0;i<matches.length;i++){
+  let n=+matches[i][1];
+  if(n<1||n>state.story.pages.length)continue;
+  let b=raw.slice(matches[i].index+matches[i][0].length,matches[i+1]?.index??raw.length).trim();
+  let textMark=b.match(/(?:^|\n)\s*Текст сказки\s*:\s*/i);
+  let sceneMark=b.match(/(?:^|\n)\s*Сцена для рисунка\s*:\s*/i);
+  let titleMark=b.match(/(?:^|\n)\s*Название эпизода\s*:\s*([^\n]+)/i);
+  let p=state.story.pages[n-1];
+  if(titleMark)p.title=titleMark[1].trim();
+  if(textMark){
+   let start=textMark.index+textMark[0].length;
+   let end=sceneMark&&sceneMark.index>start?sceneMark.index:b.length;
+   p.text=b.slice(start,end).trim();
+  }
+  if(sceneMark)p.scene=b.slice(sceneMark.index+sceneMark[0].length).trim();
+  p.approved=false;
+  done++;
+ }
+ return done;
+}
+
+document.addEventListener('input',e=>{
+ let path=e.target.dataset.path;
+ if(!path)return;
+ put(path,e.target.type==='checkbox'?e.target.checked:e.target.value);
+ if(/^story\.pages\.\d+\.text$/.test(path)){
+  put(path.replace(/\.text$/,'.approved'),false);
+ }
+ persist();
+ showPrompt();
+});
+
+document.addEventListener('change',e=>{
+ let path=e.target.dataset.path;
+ if(path){
+  put(path,e.target.type==='checkbox'?e.target.checked:e.target.value);
+  render();
+ }
+ if(e.target.id==='upload'&&e.target.files?.[0]){
+  let r=new FileReader();
+  r.onload=()=>{
+   try{
+    let o=JSON.parse(r.result);
+    if(!o.book||!o.people||!o.story?.pages||!o.image||!o.print)throw Error();
+    state=o;
+    render();
+    toast('Проект загружен');
+   }catch{
+    toast('Неправильный файл проекта');
+   }
+  };
+  r.readAsText(e.target.files[0]);
+  e.target.value='';
+ }
+});
+
+document.addEventListener('click',e=>{
+ let b=e.target.closest('button');
+ if(!b)return;
+ if(b.dataset.stage){
+  state.stage=+b.dataset.stage;
+  render();
+  scrollTo(0,0);
+  return;
+ }
+ if(b.dataset.page){
+  state.currentPage=+b.dataset.page;
+  render();
+  return;
+ }
+ let a=b.dataset.action;
+ if(!a)return;
+ if(a==='copy')return void copy();
+ if(a==='txt')return download('ПРОМТ_ЭТАП_'+state.stage+'.txt',buildPrompt());
+ if(a==='export')return download('СКАЗКА_ПРОЕКТ.json',JSON.stringify(state,null,2),'application/json;charset=utf-8');
+ if(a==='import')return void $('#upload').click();
+ if(a==='reset'){
+  if(confirm('Удалить все данные книги?')){
+   state=fresh();
+   render();
+   toast('Данные очищены');
+  }
+  return;
+ }
+ if(a==='prev'||a==='next'){
+  state.stage=Math.max(1,Math.min(4,state.stage+(a==='next'?1:-1)));
+  render();
+  scrollTo(0,0);
+  return;
+ }
+ if(a==='add'){
+  let key=b.dataset.list;
+  state.people[key].push(Array(listFields[key].length).fill(''));
+  render();
+  return;
+ }
+ if(a==='delete'){
+  state.people[b.dataset.list].splice(+b.dataset.index,1);
+  render();
+  return;
+ }
+ if(a==='parse'){
+  let count=parseStory(state.story.paste);
+  if(count){
+   render();
+   toast('Загружено страниц: '+count);
+  }else{
+   toast('Не найдено «СТРАНИЦА 01»');
+  }
+ }
+});
+
+render();
+</script>
+</body>
+</html>
